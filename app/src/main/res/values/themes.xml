@@ -1,0 +1,8 @@
+<resources>
+    <!-- Tema só da janela (antes do Compose desenhar): fundo cinza e barra de status amarela. O resto é Compose. -->
+    <style name="Theme.RotaCerta" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/fundo</item>
+        <item name="android:statusBarColor">@color/amarelo</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
