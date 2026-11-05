@@ -7,15 +7,16 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Endereço da API: local.properties (fora do git) pode sobrescrever, ex. celular físico na mesma rede:
-//   rotacerta.api.debug=http://192.168.0.10:8085/transportadora_dev/api/v1/
-//   rotacerta.api.release=https://servidor.da.empresa/transportadora/api/v1/
+// Endereço da API: local.properties (fora do git) pode sobrescrever, ex.:
+//   rotacerta.api.debug=http://192.168.0.10:8085/transportadora_dev/api/v1/     (celular na mesma rede do PC)
+//   rotacerta.api.debug=https://rotacerta.137-131-162-187.sslip.io/transportadora/api/v1/   (servidor de demonstração)
 val locais = Properties().apply {
     rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 // 10.0.2.2 = o "localhost" do computador visto de dentro do emulador
 val apiDebug = locais.getProperty("rotacerta.api.debug") ?: "http://10.0.2.2:8085/transportadora_dev/api/v1/"
-val apiRelease = locais.getProperty("rotacerta.api.release") ?: "https://localhost/transportadora/api/v1/"
+// release: servidor de demonstração (VPS com Dokploy, HTTPS do Let's Encrypt)
+val apiRelease = locais.getProperty("rotacerta.api.release") ?: "https://rotacerta.137-131-162-187.sslip.io/transportadora/api/v1/"
 
 android {
     namespace = "br.com.mba.fametro.kotlintransportadora"

@@ -119,9 +119,16 @@ Fica em `local.properties` (arquivo da máquina, fora do git), lido em tempo de 
 | Chave | Padrão | Quando mudar |
 |---|---|---|
 | `rotacerta.api.debug` | `http://10.0.2.2:8085/transportadora_dev/api/v1/` | `10.0.2.2` é o "localhost do computador" visto de dentro do emulador. Num celular de verdade, use o IP do computador na rede (ex.: `http://192.168.0.10:8085/...`) |
-| `rotacerta.api.release` | `https://localhost/transportadora/api/v1/` | o endereço HTTPS do servidor de produção |
+| `rotacerta.api.release` | `https://rotacerta.137-131-162-187.sslip.io/transportadora/api/v1/` | o servidor de demonstração (VPS com Dokploy, perfil `homolog`); troque pelo endereço HTTPS de outro servidor |
 
 O build *debug* aceita HTTP sem TLS (`src/debug/res/xml/network_security_config.xml`); o *release* só aceita HTTPS.
+
+**Celular sem cabo, usando o servidor de demonstração**: aponte o debug para a VPS e instale.
+O simulador de GPS continua disponível:
+
+```properties
+rotacerta.api.debug=https://rotacerta.137-131-162-187.sslip.io/transportadora/api/v1/
+```
 
 **Atrás de proxy** (rede do trabalho): o mapa precisa baixar os tiles do OpenStreetMap. Suba o emulador pelo proxy e
 mande a API pelo `adb reverse`:
