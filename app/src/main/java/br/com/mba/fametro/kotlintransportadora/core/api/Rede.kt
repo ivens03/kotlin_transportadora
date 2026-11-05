@@ -23,6 +23,8 @@ object Rede {
         val http = OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(20, TimeUnit.SECONDS)
+            // DNS da rede com reserva em DNS-over-HTTPS (redes que bloqueiam o domínio do servidor)
+            .dns(DnsComReserva())
             .addInterceptor(AutorizacaoInterceptor(token, aoReceber401))
             .build()
         return Retrofit.Builder()

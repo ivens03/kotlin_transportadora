@@ -89,6 +89,10 @@ br.com.mba.fametro.kotlintransportadora
     Sem sinal, os pontos acumulam; quando a conexão volta, saem em lotes de até 500. O back-end ignora pontos
     repetidos, então reenviar é seguro;
   - para sozinho quando a rota é concluída ou cancelada, ou quando o entregador sai do app.
+- **DNS com reserva** (`DnsComReserva`): algumas redes (a do DETRAN, por exemplo) bloqueiam o domínio do
+  servidor respondendo um IP falso (`127.0.0.1`/`0.0.0.0`). Quando isso acontece, ou quando o DNS da rede falha,
+  o app descobre o IP por **DNS-over-HTTPS** (Cloudflare, depois Google), que vai por HTTPS direto para o IP
+  deles e passa por cima do filtro. O certificado do servidor continua sendo verificado: muda só a descoberta do IP.
 - **Atualização automática**: a execução da rota recarrega a cada 15 s (a previsão até a próxima parada muda
   conforme o veículo anda), o rastreio do cliente também a cada 15 s, e o mapa do Suporte a cada 5 s, buscando só as
   posições novas (`GET /rotas/{id}/posicoes?desde=`).
@@ -169,6 +173,7 @@ Testes de unidade (JVM, sem emulador) em `app/src/test`:
 | `FiltroGpsTest` | intervalo mínimo, distância mínima, batimento parado, precisão ruim e o arredondamento que o back aceita |
 | `FilaGpsTest` | lote, confirmação parcial, fila que sobrevive ao app fechar, limite de tamanho, limpeza do arquivo |
 | `ApiErroTest` | tradução do `ErroResponse` do back, credencial expirada, sem conexão, cancelamento de corrotina não engolido |
+| `DnsComReservaTest` | DNS da rede quando responde certo; reserva quando ele falha ou devolve 127.0.0.1/0.0.0.0; `localhost` do emulador continua valendo |
 | `AutorizacaoInterceptorTest` (MockWebServer) | Bearer só nas chamadas autenticadas; 401 encerra a sessão, mas 401 do login não |
 
 Os fluxos completos (entregador do início ao fim da rota, Portal do Cliente e mapa do Suporte) foram validados no
