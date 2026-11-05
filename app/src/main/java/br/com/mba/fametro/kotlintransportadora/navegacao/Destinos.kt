@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 // cliente
 @Serializable object Encomendas
 @Serializable data class EncomendaDetalhe(val codigo: String)
+@Serializable object Avisos
 
 // suporte (mapa:acompanhar)
 @Serializable object RotasAcompanhar

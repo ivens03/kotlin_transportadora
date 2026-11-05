@@ -165,7 +165,15 @@ data class EncomendaResumo(
 )
 
 @Serializable
-data class Localizacao(val latitude: Double, val longitude: Double, val velocidadeKmH: Double? = null, val registradaEm: String)
+data class Localizacao(
+    val latitude: Double,
+    val longitude: Double,
+    val velocidadeKmH: Double? = null,
+    val registradaEm: String,
+    /** Rua e bairro onde o veículo está (OpenStreetMap, calculado na API); nulos se o mapa não souber. */
+    val rua: String? = null,
+    val bairro: String? = null,
+)
 
 @Serializable
 data class Rastreio(
@@ -194,3 +202,34 @@ data class EventoEncomenda(
 
 @Serializable
 data class Encomenda(val encomenda: EncomendaResumo, val rastreio: Rastreio? = null, val eventos: List<EventoEncomenda> = emptyList())
+
+// ---------- webhooks do cliente (avisos que a transportadora manda para o servidor dele) ----------
+@Serializable
+data class Webhook(val id: Long, val url: String, val eventos: List<String> = emptyList(), val ativo: Boolean = true)
+
+/** Corpo que o servidor do cliente recebeu (o mesmo JSON do POST do webhook). */
+@Serializable
+data class AvisoPayload(
+    val evento: String,
+    val descricao: String,
+    val ocorridoEm: String,
+    val encomenda: EncomendaResumo? = null,
+    val rastreio: Rastreio? = null,
+    /** Na LOCALIZACAO: "Na Av. ..., bairro · faltam ~12 min (3,4 km) · ..."; na falha: o motivo. */
+    val detalhe: String? = null,
+)
+
+/** Um aviso enviado ao webhook: o que foi, se o servidor do cliente aceitou (HTTP) e o corpo enviado. */
+@Serializable
+data class AvisoWebhook(
+    val id: Long,
+    val evento: String,
+    /** PENDENTE, ENTREGUE (servidor respondeu 2xx), FALHOU ou DESCARTADA (localização substituída por outra mais nova). */
+    val status: String,
+    val tentativas: Int = 0,
+    val ultimoStatusHttp: Int? = null,
+    val ultimoErro: String? = null,
+    val criadaEm: String,
+    val entregueEm: String? = null,
+    val payload: AvisoPayload? = null,
+)

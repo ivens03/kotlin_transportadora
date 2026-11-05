@@ -22,12 +22,15 @@ class RotaCertaApp : Application() {
             osmdroidTileCache = File(cacheDir, "osmdroid/tiles")
         }
 
-        getSystemService(NotificationManager::class.java).createNotificationChannel(
-            NotificationChannel(CANAL_RASTREIO, getString(R.string.canal_rastreio), NotificationManager.IMPORTANCE_LOW)
-        )
+        getSystemService(NotificationManager::class.java).createNotificationChannels(listOf(
+            NotificationChannel(CANAL_RASTREIO, getString(R.string.canal_rastreio), NotificationManager.IMPORTANCE_LOW),
+            // HIGH = aparece no topo da tela (heads-up), como mensagem nova
+            NotificationChannel(CANAL_AVISOS, getString(R.string.canal_avisos), NotificationManager.IMPORTANCE_HIGH),
+        ))
     }
 
     companion object {
         const val CANAL_RASTREIO = "rastreio"
+        const val CANAL_AVISOS = "avisos"
     }
 }

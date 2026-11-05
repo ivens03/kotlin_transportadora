@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">RotaCerta</string>
     <string name="canal_rastreio">Rastreamento da rota</string>
+    <string name="canal_avisos">Avisos das encomendas</string>
 </resources>

@@ -117,6 +117,10 @@ private fun Detalhe(d: Encomenda, modifier: Modifier) {
                     Spacer(Modifier.height(8.dp))
                     Text(previsao(d), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Cores.Texto)
                     detalhePrevisao(d)?.let { Text(it, color = Cores.AzulEscuro, modifier = Modifier.padding(top = 4.dp)) }
+                    r?.localizacao?.rua?.let { rua ->
+                        Text("Agora na $rua" + (r.localizacao.bairro?.let { ", $it" } ?: ""),
+                            fontWeight = FontWeight.SemiBold, color = Cores.Texto, modifier = Modifier.padding(top = 4.dp))
+                    }
                     r?.localizacao?.let {
                         Text("Posição do veículo atualizada ${Formato.haQuanto(it.registradaEm)}",
                             style = MaterialTheme.typography.bodyMedium, color = Cores.TextoSuave, modifier = Modifier.padding(top = 4.dp))

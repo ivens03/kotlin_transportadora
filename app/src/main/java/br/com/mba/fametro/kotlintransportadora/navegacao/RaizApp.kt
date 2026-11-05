@@ -1,6 +1,7 @@
 package br.com.mba.fametro.kotlintransportadora.navegacao
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.platform.LocalContext
@@ -17,6 +18,7 @@ import br.com.mba.fametro.kotlintransportadora.acesso.EntrarTela
 import br.com.mba.fametro.kotlintransportadora.acesso.PrimeiroAcessoTela
 import br.com.mba.fametro.kotlintransportadora.acesso.SemModuloTela
 import br.com.mba.fametro.kotlintransportadora.acesso.TrocarCredencialTela
+import br.com.mba.fametro.kotlintransportadora.cliente.AvisosTela
 import br.com.mba.fametro.kotlintransportadora.cliente.EncomendaDetalheTela
 import br.com.mba.fametro.kotlintransportadora.cliente.EncomendasTela
 import br.com.mba.fametro.kotlintransportadora.core.sessao.EstadoSessao
@@ -80,10 +82,21 @@ private fun NavegacaoModulo(sessao: Sessao) {
         Modulo.SUPORTE -> RotasAcompanhar
         Modulo.SEM_MODULO -> SemModulo
     }
+    // cliente: acompanha os avisos do webhook enquanto estiver logado (notificação a cada aviso novo)
+    if (sessao.modulo == Modulo.CLIENTE) {
+        val vigia = container().avisos
+        DisposableEffect(sessao.token) {
+            vigia.iniciar()
+            onDispose { vigia.parar() }
+        }
+    }
     NavHost(nav, startDestination = inicio) {
         composable<MinhasRotas> { MinhasRotasTela(sessao, aoAbrir = { nav.navigate(RotaExecucao(it)) }) }
         composable<RotaExecucao> { RotaExecucaoTela(it.toRoute<RotaExecucao>().id, aoVoltar = { nav.popBackStack() }) }
-        composable<Encomendas> { EncomendasTela(sessao, aoAbrir = { nav.navigate(EncomendaDetalhe(it)) }) }
+        composable<Encomendas> {
+            EncomendasTela(sessao, aoAbrir = { nav.navigate(EncomendaDetalhe(it)) }, aoVerAvisos = { nav.navigate(Avisos) })
+        }
+        composable<Avisos> { AvisosTela(aoVoltar = { nav.popBackStack() }) }
         composable<EncomendaDetalhe> { EncomendaDetalheTela(it.toRoute<EncomendaDetalhe>().codigo, aoVoltar = { nav.popBackStack() }) }
         composable<RotasAcompanhar> { RotasAcompanharTela(sessao, aoAbrir = { nav.navigate(RotaMapa(it)) }) }
         composable<RotaMapa> { RotaMapaTela(it.toRoute<RotaMapa>().id, aoVoltar = { nav.popBackStack() }) }

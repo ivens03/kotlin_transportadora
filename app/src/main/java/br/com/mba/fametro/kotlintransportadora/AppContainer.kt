@@ -1,6 +1,7 @@
 package br.com.mba.fametro.kotlintransportadora
 
 import android.app.Application
+import br.com.mba.fametro.kotlintransportadora.cliente.VigiaAvisos
 import br.com.mba.fametro.kotlintransportadora.core.api.ApiErro
 import br.com.mba.fametro.kotlintransportadora.core.api.Rede
 import br.com.mba.fametro.kotlintransportadora.core.api.RotaCertaApi
@@ -35,6 +36,9 @@ class AppContainer(app: Application) {
 
     /** O que o rastreador está fazendo agora (a tela da rota observa). */
     val rastreio = MutableStateFlow(EstadoRastreio())
+
+    /** Cliente logado: acompanha os avisos do webhook e notifica os novos. */
+    val avisos by lazy { VigiaAvisos(this) }
 
     init {
         sessao.api = api

@@ -9,7 +9,7 @@ Um app só, três módulos: a tela que abre depende do **perfil** de quem entrou
 | Perfil | Como entra | O que faz no celular |
 |---|---|---|
 | **ENTREGADOR** | matrícula + PIN de 6 dígitos | vê as rotas dele, inicia a rota, navega até a próxima parada, liga para o destinatário, dá baixa (entregue / não entregue com motivo). Com a rota em andamento, o GPS é enviado mesmo com o app em segundo plano |
-| **CLIENTE** | e-mail + senha (aba *Empresa*) | Portal do Cliente: lista as encomendas e acompanha cada uma no mapa, com previsão de chegada, "você é a próxima entrega" e linha do tempo |
+| **CLIENTE** | e-mail + senha (aba *Empresa*) | Portal do Cliente: lista as encomendas e acompanha cada uma no mapa, com previsão de chegada, a **rua onde o veículo está**, "você é a próxima entrega" e linha do tempo. O sino abre os **avisos do webhook** (o que foi enviado ao servidor do cliente e se ele aceitou) e cada aviso novo vira **notificação** no celular |
 | **SUPORTE** | e-mail + senha (aba *Empresa*) | acompanha as rotas ao vivo: mapa com o trajeto planejado, o rastro real do veículo, progresso e próxima parada |
 
 Os outros perfis (Administrativo, Financeiro, Desenvolvimento) entram, mas veem só um aviso: o trabalho deles é no painel web.
@@ -61,7 +61,7 @@ br.com.mba.fametro.kotlintransportadora
 │   └── ui/                tema (paleta Mercado Livre), componentes e mapa (MapaOsm, MapaRota)
 ├── acesso/                entrar, primeiro acesso, trocar PIN/senha
 ├── entregador/            minhas rotas, execução da rota, RastreadorService, FilaGps, SimuladorGps
-├── cliente/               encomendas e rastreio
+├── cliente/               encomendas, rastreio e avisos do webhook (VigiaAvisos → notificação)
 └── suporte/               rotas para acompanhar e mapa ao vivo
 ```
 
@@ -93,6 +93,13 @@ br.com.mba.fametro.kotlintransportadora
   servidor respondendo um IP falso (`127.0.0.1`/`0.0.0.0`). Quando isso acontece, ou quando o DNS da rede falha,
   o app descobre o IP por **DNS-over-HTTPS** (Cloudflare, depois Google), que vai por HTTPS direto para o IP
   deles e passa por cima do filtro. O certificado do servidor continua sendo verificado: muda só a descoberta do IP.
+- **Avisos do webhook → notificação** (`VigiaAvisos`): o webhook é servidor → servidor (a API faz `POST` na URL
+  do sistema do cliente), então o celular não recebe esse `POST`. Com o cliente logado, o app lê a cada 5 s o
+  histórico de envios (`GET /webhooks/{id}/entregas`, que guarda o corpo exato enviado) e, para cada aviso que o
+  servidor do cliente **aceitou** (HTTP 2xx), mostra uma notificação. Ex.: *"CRG-000001 · Localização do veículo
+  atualizada: Na Avenida Bezerra de Menezes, São Gerardo · faltam ~4 min (1,2 km) · é a próxima entrega"*. Uma
+  notificação por encomenda: a localização nova substitui a anterior em vez de empilhar. Canal com prioridade alta
+  (aparece no topo da tela); no Android 13+ o app pede a permissão de notificação ao abrir as encomendas.
 - **Atualização automática**: a execução da rota recarrega a cada 15 s (a previsão até a próxima parada muda
   conforme o veículo anda), o rastreio do cliente também a cada 15 s, e o mapa do Suporte a cada 5 s, buscando só as
   posições novas (`GET /rotas/{id}/posicoes?desde=`).
@@ -173,6 +180,7 @@ Testes de unidade (JVM, sem emulador) em `app/src/test`:
 | `FiltroGpsTest` | intervalo mínimo, distância mínima, batimento parado, precisão ruim e o arredondamento que o back aceita |
 | `FilaGpsTest` | lote, confirmação parcial, fila que sobrevive ao app fechar, limite de tamanho, limpeza do arquivo |
 | `ApiErroTest` | tradução do `ErroResponse` do back, credencial expirada, sem conexão, cancelamento de corrotina não engolido |
+| `VigiaAvisosTest` | só notifica aviso novo que o servidor do cliente aceitou (não PING, não descartado); texto com a rua e quanto falta; uma notificação por encomenda |
 | `DnsComReservaTest` | DNS da rede quando responde certo; reserva quando ele falha ou devolve 127.0.0.1/0.0.0.0; `localhost` do emulador continua valendo |
 | `AutorizacaoInterceptorTest` (MockWebServer) | Bearer só nas chamadas autenticadas; 401 encerra a sessão, mas 401 do login não |
 

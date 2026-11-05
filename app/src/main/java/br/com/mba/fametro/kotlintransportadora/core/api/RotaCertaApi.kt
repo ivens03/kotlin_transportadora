@@ -61,4 +61,11 @@ interface RotaCertaApi {
 
     @GET("encomendas/{codigo}")
     suspend fun encomenda(@Path("codigo") codigo: String): Encomenda
+
+    @GET("webhooks")
+    suspend fun webhooks(@Query("size") tamanho: Int = 10): Pagina<Webhook>
+
+    /** Mais recentes primeiro (a API ordena por criadaEm desc). */
+    @GET("webhooks/{id}/entregas")
+    suspend fun avisosDoWebhook(@Path("id") id: Long, @Query("size") tamanho: Int = 30): Pagina<AvisoWebhook>
 }
