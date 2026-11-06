@@ -56,6 +56,7 @@ data class RotaResumo(
     val id: Long,
     val codigo: String,
     val status: String,
+    val veiculoId: Long? = null,
     val veiculoPlaca: String,
     val entregadorMatricula: String,
     val entregadorNome: String,
@@ -233,3 +234,75 @@ data class AvisoWebhook(
     val entregueEm: String? = null,
     val payload: AvisoPayload? = null,
 )
+
+// ---------- Suporte: empresas e nova entrega ----------
+
+/** Empresa cliente (GET /clientes). Endereço nulo em cliente antigo, cadastrado sem os dados da empresa. */
+@Serializable
+data class Cliente(
+    val matricula: String,
+    val nome: String,
+    val email: String? = null,
+    val status: String,
+    val cnpj: String? = null,
+    val telefone: String? = null,
+    val cep: String? = null,
+    val endereco: String? = null,
+    val bairro: String? = null,
+    val cidade: String? = null,
+    val uf: String? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+) {
+    /** Dá para usar como destino da entrega (tem endereço e ponto no mapa). */
+    val temEndereco: Boolean get() = !endereco.isNullOrBlank() && latitude != null && longitude != null
+}
+
+@Serializable
+data class NovaEmpresa(
+    val nome: String,
+    val cnpj: String,
+    val email: String,
+    val telefone: String? = null,
+    val cep: String? = null,
+    val endereco: String,
+    val bairro: String,
+    val cidade: String,
+    val uf: String,
+    val latitude: Double,
+    val longitude: Double,
+)
+
+/** Login criado: o código aparece uma vez só (a API guarda só o hash). */
+@Serializable
+data class CodigoAtivacao(val matricula: String, val nome: String, val codigoAtivacao: String, val codigoExpiraEm: String,
+                          val instrucao: String? = null)
+
+@Serializable data class Entregador(val matricula: String, val nome: String, val status: String)
+
+@Serializable
+data class VeiculoResumo(val id: Long, val placa: String, val modelo: String, val marca: String? = null, val status: String,
+                         val capacidadeCargaKg: Double? = null, val capacidadeVolumeM3: Double? = null)
+
+@Serializable
+data class NovaCarga(
+    val descricao: String,
+    val pesoKg: Double,
+    val volumeM3: Double,
+    val destinatarioNome: String,
+    val destinatarioTelefone: String? = null,
+    val endereco: String,
+    val bairro: String,
+    val cidade: String,
+    val uf: String,
+    val cep: String? = null,
+    val latitude: Double,
+    val longitude: Double,
+    val clienteMatricula: String? = null,
+)
+
+@Serializable data class CargaCriada(val id: Long, val codigo: String, val status: String)
+
+@Serializable data class NovaRota(val veiculoId: Long, val entregadorMatricula: String, val cargaIds: List<Long>)
+
+@Serializable data class IncluirCargas(val cargaIds: List<Long>)

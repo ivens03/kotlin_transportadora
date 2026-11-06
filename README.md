@@ -62,7 +62,7 @@ br.com.mba.fametro.kotlintransportadora
 ├── acesso/                entrar, primeiro acesso, trocar PIN/senha
 ├── entregador/            minhas rotas, execução da rota, RastreadorService, FilaGps, SimuladorGps
 ├── cliente/               encomendas, rastreio e avisos do webhook (VigiaAvisos → notificação)
-└── suporte/               rotas para acompanhar e mapa ao vivo
+└── suporte/               rotas para acompanhar, mapa ao vivo, empresas clientes e nova entrega
 ```
 
 ### Conceitos (para quem vem do Spring)
@@ -93,7 +93,17 @@ br.com.mba.fametro.kotlintransportadora
   servidor respondendo um IP falso (`127.0.0.1`/`0.0.0.0`). Quando isso acontece, ou quando o DNS da rede falha,
   o app descobre o IP por **DNS-over-HTTPS** (Cloudflare, depois Google), que vai por HTTPS direto para o IP
   deles e passa por cima do filtro. O certificado do servidor continua sendo verificado: muda só a descoberta do IP.
-- **Campos que só aceitam o formato** (`core/formato/Mascaras.kt`): no `onValueChange` do campo, o texto passa por um filtro antes de virar estado (matrícula em maiúsculas, PIN só números, e-mail sem espaço). Mesmas regras do site. O filtro não insere hífen: no Compose, mudar o tamanho do texto enquanto a pessoa digita faz o cursor pular.
+- **Campos que só aceitam o formato** (`core/formato/Mascaras.kt`): no `onValueChange` do campo, o texto passa por um filtro antes de virar estado (matrícula em maiúsculas, PIN só números, e-mail sem espaço, CNPJ com 12 letras/números + 2 dígitos, peso com uma vírgula). Mesmas regras do site. O filtro não insere pontuação: no Compose, mudar o tamanho do texto enquanto a pessoa digita faz o cursor pular.
+- **Máscara só na tela** (`MascaraVisual`, um `VisualTransformation`): para CNPJ, CEP e telefone o estado guarda só
+  os caracteres (`RC202600000106`) e a pontuação é desenhada por cima (`RC.202.600/0001-06`). O `OffsetMapping`
+  traduz a posição do cursor entre os dois textos, então digitar ou apagar no meio não faz o cursor pular — e o
+  valor já vai limpo para a API. É o equivalente do `ControlValueAccessor` da diretiva de máscara do Angular.
+- **Empresa → entrega → entregador** (módulo Suporte): o ícone de loja em "Acompanhar rotas" abre **Empresas**
+  (lista + cadastro com CNPJ, e-mail do Portal, telefone, CEP via ViaCEP e ponto no mapa via OpenStreetMap). O
+  cadastro mostra o código de ativação uma vez e leva para **Nova entrega**: escolhe a empresa (o destino é o
+  endereço dela), o que vai e, opcional, **quem leva**. Com entregador e veículo, a rota já sai pronta; se o
+  entregador já tem rota que **ainda não saiu**, a entrega entra nela (`POST /rotas/{id}/cargas`) e a ordem das
+  paradas é recalculada. Entregador na rua e veículo em uso aparecem desabilitados.
 - **Avisos do webhook → notificação** (`VigiaAvisos`): o webhook é servidor → servidor (a API faz `POST` na URL
   do sistema do cliente), então o celular não recebe esse `POST`. Com o cliente logado, o app lê a cada 5 s o
   histórico de envios (`GET /webhooks/{id}/entregas`, que guarda o corpo exato enviado) e, para cada aviso que o
@@ -182,12 +192,14 @@ Testes de unidade (JVM, sem emulador) em `app/src/test`:
 | `FilaGpsTest` | lote, confirmação parcial, fila que sobrevive ao app fechar, limite de tamanho, limpeza do arquivo |
 | `ApiErroTest` | tradução do `ErroResponse` do back, credencial expirada, sem conexão, cancelamento de corrotina não engolido |
 | `VigiaAvisosTest` | só notifica aviso novo que o servidor do cliente aceitou (não PING, não descartado); texto com a rua e quanto falta; uma notificação por encomenda |
-| `MascarasTest` | matrícula em maiúsculas, código de ativação com 8 letras/números, e-mail sem espaço e minúsculo, PIN só com 6 números |
+| `MascarasTest` | matrícula em maiúsculas, código de ativação com 8 letras/números, e-mail sem espaço e minúsculo, PIN só com 6 números; CNPJ, telefone, CEP, UF e decimal com vírgula |
+| `CnpjTest` | dígitos verificadores do CNPJ numérico e do alfanumérico (exemplo oficial `12ABC34501DE35`), formatação |
+| `MascaraVisualTest` | texto da tela com a pontuação e o cursor pulando os símbolos |
 | `DnsComReservaTest` | DNS da rede quando responde certo; reserva quando ele falha ou devolve 127.0.0.1/0.0.0.0; `localhost` do emulador continua valendo |
 | `AutorizacaoInterceptorTest` (MockWebServer) | Bearer só nas chamadas autenticadas; 401 encerra a sessão, mas 401 do login não |
 
 Os fluxos completos (entregador do início ao fim da rota, Portal do Cliente e mapa do Suporte) foram validados no
-emulador contra a API local.
+emulador contra a API local; o de empresa → nova entrega → rota, num Galaxy A55 contra o servidor de demonstração.
 
 ## Permissões
 

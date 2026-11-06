@@ -15,9 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -76,12 +82,19 @@ private val FILTROS = listOf("EM_ANDAMENTO" to "Em andamento", "PLANEJADA" to "P
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RotasAcompanharTela(sessao: Sessao, aoAbrir: (Long) -> Unit) {
+fun RotasAcompanharTela(sessao: Sessao, aoAbrir: (Long) -> Unit, aoEmpresas: () -> Unit, aoNovaEntrega: () -> Unit) {
     val vm = viewModelDe { RotasAcompanharViewModel(it) }
     val c = container()
     LaunchedEffect(Unit) { vm.carregar() }
 
-    Scaffold(topBar = { Topo("Acompanhar rotas", "${sessao.primeiroNome} · Suporte", acoes = { BotaoSair { c.sessao.sair() } }) },
+    Scaffold(topBar = { Topo("Acompanhar rotas", "${sessao.primeiroNome} · Suporte", acoes = {
+            IconButton(onClick = aoEmpresas) { Icon(Icons.Filled.Storefront, contentDescription = "Empresas", tint = Cores.Azul) }
+            BotaoSair { c.sessao.sair() }
+        }) },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(onClick = aoNovaEntrega, containerColor = Cores.Laranja, contentColor = Color.White,
+                icon = { Icon(Icons.Filled.Add, contentDescription = null) }, text = { Text("Nova entrega") })
+        },
         containerColor = Cores.Fundo) { m ->
         Column(Modifier.padding(m).fillMaxSize()) {
             Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 8.dp),
@@ -93,7 +106,7 @@ fun RotasAcompanharTela(sessao: Sessao, aoAbrir: (Long) -> Unit) {
                     EstadoTela.Carregando -> Carregando()
                     is EstadoTela.Erro -> TelaErro(e.mensagem) { vm.carregar() }
                     is EstadoTela.Pronto -> if (e.dado.isEmpty()) Vazio("Nenhuma rota", "Não há rotas com esse status agora.", Icons.Filled.Map)
-                    else LazyColumn(contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    else LazyColumn(contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 88.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         items(e.dado, key = { it.id }) { r ->
                             Cartao(Modifier.clickable { aoAbrir(r.id) }) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {

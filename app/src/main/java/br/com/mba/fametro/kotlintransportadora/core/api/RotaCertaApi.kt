@@ -68,4 +68,29 @@ interface RotaCertaApi {
     /** Mais recentes primeiro (a API ordena por criadaEm desc). */
     @GET("webhooks/{id}/entregas")
     suspend fun avisosDoWebhook(@Path("id") id: Long, @Query("size") tamanho: Int = 30): Pagina<AvisoWebhook>
+
+    // Suporte: empresas clientes e nova entrega
+    @GET("clientes")
+    suspend fun clientes(@Query("size") tamanho: Int = 500): Pagina<Cliente>
+
+    /** Cadastra a empresa e devolve o código de ativação do login dela no Portal do Cliente. */
+    @POST("clientes")
+    suspend fun cadastrarEmpresa(@Body corpo: NovaEmpresa): CodigoAtivacao
+
+    @GET("entregadores")
+    suspend fun entregadores(@Query("status") status: String = "ATIVO", @Query("size") tamanho: Int = 100): Pagina<Entregador>
+
+    @GET("veiculos")
+    suspend fun veiculos(@Query("status") status: String = "ATIVO", @Query("size") tamanho: Int = 100): Pagina<VeiculoResumo>
+
+    @POST("cargas")
+    suspend fun cadastrarCarga(@Body corpo: NovaCarga): CargaCriada
+
+    /** Rota só com as cargas escolhidas, já com entregador e veículo (o entregador vê em "Minhas rotas"). */
+    @POST("rotas")
+    suspend fun gerarRota(@Body corpo: NovaRota): Rota
+
+    /** Entregador já tem rota que ainda não saiu: a carga entra nela e a ordem das paradas é recalculada. */
+    @POST("rotas/{id}/cargas")
+    suspend fun incluirNaRota(@Path("id") id: Long, @Body corpo: IncluirCargas): Rota
 }

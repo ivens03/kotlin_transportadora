@@ -27,6 +27,9 @@ import br.com.mba.fametro.kotlintransportadora.core.sessao.Sessao
 import br.com.mba.fametro.kotlintransportadora.core.ui.componentes.Carregando
 import br.com.mba.fametro.kotlintransportadora.entregador.MinhasRotasTela
 import br.com.mba.fametro.kotlintransportadora.entregador.RotaExecucaoTela
+import br.com.mba.fametro.kotlintransportadora.suporte.EmpresaNovaTela
+import br.com.mba.fametro.kotlintransportadora.suporte.EmpresasTela
+import br.com.mba.fametro.kotlintransportadora.suporte.NovaEntregaTela
 import br.com.mba.fametro.kotlintransportadora.suporte.RotaMapaTela
 import br.com.mba.fametro.kotlintransportadora.suporte.RotasAcompanharTela
 
@@ -98,7 +101,25 @@ private fun NavegacaoModulo(sessao: Sessao) {
         }
         composable<Avisos> { AvisosTela(aoVoltar = { nav.popBackStack() }) }
         composable<EncomendaDetalhe> { EncomendaDetalheTela(it.toRoute<EncomendaDetalhe>().codigo, aoVoltar = { nav.popBackStack() }) }
-        composable<RotasAcompanhar> { RotasAcompanharTela(sessao, aoAbrir = { nav.navigate(RotaMapa(it)) }) }
+        composable<RotasAcompanhar> {
+            RotasAcompanharTela(sessao, aoAbrir = { nav.navigate(RotaMapa(it)) },
+                aoEmpresas = { nav.navigate(Empresas) }, aoNovaEntrega = { nav.navigate(NovaEntrega()) })
+        }
+        composable<Empresas> {
+            EmpresasTela(aoVoltar = { nav.popBackStack() }, aoNova = { nav.navigate(EmpresaNova) },
+                aoEntregar = { nav.navigate(NovaEntrega(it)) })
+        }
+        composable<EmpresaNova> {
+            // "Nova entrega para X" troca o cadastro pela entrega: o voltar cai na lista de empresas
+            EmpresaNovaTela(aoVoltar = { nav.popBackStack() },
+                aoEntregar = { nav.navigate(NovaEntrega(it)) { popUpTo<EmpresaNova> { inclusive = true } } })
+        }
+        composable<NovaEntrega> {
+            NovaEntregaTela(it.toRoute<NovaEntrega>().empresa, aoVoltar = { nav.popBackStack() },
+                aoNovaEmpresa = { nav.navigate(EmpresaNova) },
+                // rota gerada: abre o mapa dela no lugar do formulário
+                aoAbrirRota = { id -> nav.navigate(RotaMapa(id)) { popUpTo<NovaEntrega> { inclusive = true } } })
+        }
         composable<RotaMapa> { RotaMapaTela(it.toRoute<RotaMapa>().id, aoVoltar = { nav.popBackStack() }) }
         composable<SemModulo> { SemModuloTela(sessao) }
     }

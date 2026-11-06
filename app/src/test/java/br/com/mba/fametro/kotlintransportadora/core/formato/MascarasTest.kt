@@ -28,3 +28,28 @@ class MascarasTest {
         assertEquals("", Mascaras.pin("abc"))
     }
 }
+
+class MascarasEmpresaTest {
+
+    @Test
+    fun `CNPJ - 12 letras ou números e 2 dígitos no fim`() {
+        assertEquals("12ABC34501DE35", Mascaras.cnpj("12.abc.345/01de-35"))
+        assertEquals("12ABC34501DE", Mascaras.cnpj("12ABC34501DEXY")) // letra não entra nos dígitos verificadores
+        assertEquals("11222333000181", Mascaras.cnpj("11.222.333/0001-8199"))
+    }
+
+    @Test
+    fun `telefone, CEP e UF`() {
+        assertEquals("85999998888", Mascaras.telefone("(85) 99999-8888 1"))
+        assertEquals("60325001", Mascaras.cep("60325-0019"))
+        assertEquals("CE", Mascaras.uf("c-e1x"))
+    }
+
+    @Test
+    fun `decimal com uma vírgula e casas limitadas`() {
+        assertEquals("1250,50", Mascaras.decimal("1250.505", 2))
+        assertEquals("0,125", Mascaras.decimal("0,12,59", 3))
+        assertEquals(1250.5, Mascaras.numero("1250,50")!!, 0.0001)
+        assertEquals(null, Mascaras.numero(","))
+    }
+}

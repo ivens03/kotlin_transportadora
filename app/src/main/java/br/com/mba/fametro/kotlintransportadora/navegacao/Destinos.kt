@@ -21,6 +21,10 @@ import kotlinx.serialization.Serializable
 // suporte (mapa:acompanhar)
 @Serializable object RotasAcompanhar
 @Serializable data class RotaMapa(val id: Long)
+@Serializable object Empresas
+@Serializable object EmpresaNova
+/** @param empresa matrícula da empresa já escolhida (vindo da lista ou do cadastro) */
+@Serializable data class NovaEntrega(val empresa: String? = null)
 
 // perfis do painel sem módulo no app (Administrativo, Financeiro, Desenvolvimento)
 @Serializable object SemModulo

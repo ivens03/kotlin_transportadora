@@ -33,6 +33,9 @@ fun CampoTexto(
     maiusculas: Boolean = false,
     dica: String? = null,
     ultimo: Boolean = false,
+    /** Formata só na tela (ex.: MascaraVisual.CNPJ); o valor continua limpo. */
+    mascara: VisualTransformation? = null,
+    habilitado: Boolean = true,
 ) {
     var mostrar by rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(
@@ -48,7 +51,12 @@ fun CampoTexto(
             imeAction = if (ultimo) ImeAction.Done else ImeAction.Next,
             autoCorrectEnabled = false,
         ),
-        visualTransformation = if (segredo && !mostrar) PasswordVisualTransformation() else VisualTransformation.None,
+        enabled = habilitado,
+        visualTransformation = when {
+            segredo && !mostrar -> PasswordVisualTransformation()
+            mascara != null -> mascara
+            else -> VisualTransformation.None
+        },
         trailingIcon = if (!segredo) null else {
             {
                 IconButton(onClick = { mostrar = !mostrar }) {
