@@ -181,7 +181,8 @@ fun NovaEntregaTela(empresaInicial: String?, aoVoltar: () -> Unit, aoNovaEmpresa
                 Seletor("Empresa", vm.empresas.map {
                     Opcao(it.matricula, it.nome, if (it.temEndereco) it.cnpj?.let(Cnpj::formatar) ?: it.matricula else "Sem endereço cadastrado",
                         habilitada = it.temEndereco)
-                }, vm.empresa, { vm.empresa = it }, textoVazio = "Nenhuma empresa cadastrada")
+                }, vm.empresa, { vm.empresa = it },
+                    textoVazio = if (vm.empresas.isEmpty()) "Nenhuma empresa cadastrada" else "Escolha a empresa")
                 TextButton(onClick = aoNovaEmpresa) { Text("+ Cadastrar outra empresa") }
                 vm.escolhida?.takeIf { it.temEndereco }?.let { e ->
                     Text("Entregar em", style = MaterialTheme.typography.bodySmall, color = Cores.TextoSuave)

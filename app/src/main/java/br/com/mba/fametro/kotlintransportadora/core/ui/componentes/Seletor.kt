@@ -28,6 +28,7 @@ data class Opcao<T>(val valor: T, val texto: String, val apoio: String? = null, 
 /**
  * Campo de escolha (parece um campo de texto; o toque abre a lista). Versão simples do "dropdown",
  * sem depender da API experimental do Material 3.
+ * [textoVazio]: o que aparece com nada escolhido (vira também o primeiro item da lista, que limpa a escolha).
  */
 @Composable
 fun <T> Seletor(rotulo: String, opcoes: List<Opcao<T>>, escolhido: T?, aoEscolher: (T?) -> Unit,
