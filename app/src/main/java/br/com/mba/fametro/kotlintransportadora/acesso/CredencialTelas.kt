@@ -1,5 +1,6 @@
 package br.com.mba.fametro.kotlintransportadora.acesso
 
+import br.com.mba.fametro.kotlintransportadora.core.formato.Mascaras
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -83,7 +84,8 @@ private fun FormularioCredencial(ativacao: Boolean, matricula: String?, vencida:
     val vm = viewModelDe(chave = "cred-$ativacao-$matricula") { CredencialViewModel(it, matricula) }
     val titulo = if (ativacao) "Primeiro acesso" else "Trocar ${vm.nome}"
     val teclado = if (vm.ehPin) KeyboardType.NumberPassword else KeyboardType.Password
-    val limite: (String) -> Boolean = { !vm.ehPin || (it.length <= 6 && it.all(Char::isDigit)) }
+    /** PIN: só números, até 6 (Mascaras.pin); senha: livre. */
+    val filtro: (String) -> String = { if (vm.ehPin) Mascaras.pin(it) else it }
 
     Scaffold(topBar = { Topo(titulo, aoVoltar = aoVoltar) }, containerColor = Cores.Fundo) { margem ->
         Column(Modifier.fillMaxSize().padding(margem).verticalScroll(rememberScrollState()).imePadding().padding(16.dp),
@@ -96,14 +98,14 @@ private fun FormularioCredencial(ativacao: Boolean, matricula: String?, vencida:
                     style = MaterialTheme.typography.bodyMedium, color = Cores.TextoSuave,
                 )
                 Spacer(Modifier.height(12.dp))
-                CampoTexto(vm.matricula, { vm.matricula = it }, "Matrícula", dica = "ENT-000001 / FUN-… / CLI-…", maiusculas = true)
+                CampoTexto(vm.matricula, { vm.matricula = Mascaras.matricula(it) }, "Matrícula", dica = "ENT-000001 / FUN-… / CLI-…", maiusculas = true)
                 Spacer(Modifier.height(8.dp))
-                if (ativacao) CampoTexto(vm.codigoOuAtual, { vm.codigoOuAtual = it }, "Código de ativação", maiusculas = true)
-                else CampoTexto(vm.codigoOuAtual, { if (limite(it)) vm.codigoOuAtual = it }, "${vm.nome.replaceFirstChar(Char::uppercase)} atual", tipo = teclado, segredo = true)
+                if (ativacao) CampoTexto(vm.codigoOuAtual, { vm.codigoOuAtual = Mascaras.codigoAtivacao(it) }, "Código de ativação", dica = "8 letras ou números", maiusculas = true)
+                else CampoTexto(vm.codigoOuAtual, { vm.codigoOuAtual = filtro(it) }, "${vm.nome.replaceFirstChar(Char::uppercase)} atual", tipo = teclado, segredo = true)
                 Spacer(Modifier.height(8.dp))
-                CampoTexto(vm.nova, { if (limite(it)) vm.nova = it }, "Novo ${vm.nome}", tipo = teclado, segredo = true)
+                CampoTexto(vm.nova, { vm.nova = filtro(it) }, "Novo ${vm.nome}", tipo = teclado, segredo = true)
                 Spacer(Modifier.height(8.dp))
-                CampoTexto(vm.confirmacao, { if (limite(it)) vm.confirmacao = it }, "Confirme o novo ${vm.nome}", tipo = teclado, segredo = true, ultimo = true)
+                CampoTexto(vm.confirmacao, { vm.confirmacao = filtro(it) }, "Confirme o novo ${vm.nome}", tipo = teclado, segredo = true, ultimo = true)
                 Spacer(Modifier.height(6.dp))
                 Text(
                     if (vm.ehPin) "PIN: 6 números, sem sequência (123456) nem repetição (111111)."

@@ -1,5 +1,6 @@
 package br.com.mba.fametro.kotlintransportadora.acesso
 
+import br.com.mba.fametro.kotlintransportadora.core.formato.Mascaras
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -135,12 +136,12 @@ fun EntrarTela(
                 }
                 Spacer(Modifier.height(16.dp))
                 if (vm.entregador) {
-                    CampoTexto(vm.matricula, { vm.matricula = it }, "Matrícula", dica = "ENT-000001", maiusculas = true)
+                    CampoTexto(vm.matricula, { vm.matricula = Mascaras.matricula(it) }, "Matrícula", dica = "ENT-000001", maiusculas = true)
                     Spacer(Modifier.height(8.dp))
-                    CampoTexto(vm.pin, { if (it.length <= 6 && it.all(Char::isDigit)) vm.pin = it }, "PIN (6 dígitos)",
+                    CampoTexto(vm.pin, { vm.pin = Mascaras.pin(it) }, "PIN (6 dígitos)",
                         tipo = KeyboardType.NumberPassword, segredo = true, ultimo = true)
                 } else {
-                    CampoTexto(vm.email, { vm.email = it }, "E-mail", tipo = KeyboardType.Email)
+                    CampoTexto(vm.email, { vm.email = Mascaras.email(it) }, "E-mail", tipo = KeyboardType.Email)
                     Spacer(Modifier.height(8.dp))
                     CampoTexto(vm.senha, { vm.senha = it }, "Senha", tipo = KeyboardType.Password, segredo = true, ultimo = true)
                     Spacer(Modifier.height(6.dp))
