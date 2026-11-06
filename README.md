@@ -62,7 +62,8 @@ br.com.mba.fametro.kotlintransportadora
 ├── acesso/                entrar, primeiro acesso, trocar PIN/senha
 ├── entregador/            minhas rotas, execução da rota, RastreadorService, FilaGps, SimuladorGps
 ├── cliente/               encomendas, rastreio e avisos do webhook (VigiaAvisos → notificação)
-└── suporte/               rotas para acompanhar, mapa ao vivo, empresas clientes e nova entrega
+├── suporte/               rotas para acompanhar, mapa ao vivo, empresas clientes e nova entrega
+└── desenvolvimento/       "Como funciona": o caminho do dado do app à VPS (GET /arquitetura)
 ```
 
 ### Conceitos (para quem vem do Spring)
@@ -98,6 +99,12 @@ br.com.mba.fametro.kotlintransportadora
   os caracteres (`RC202600000106`) e a pontuação é desenhada por cima (`RC.202.600/0001-06`). O `OffsetMapping`
   traduz a posição do cursor entre os dois textos, então digitar ou apagar no meio não faz o cursor pular — e o
   valor já vai limpo para a API. É o equivalente do `ControlValueAccessor` da diretiva de máscara do Angular.
+- **Como funciona** (módulo Desenvolvimento, permissão `mensageria:monitorar`): o perfil Desenvolvimento, que
+  antes caía em "use o painel web", abre o desenho do sistema — servidor medido agora (Java, Spring Boot,
+  Hibernate, Postgres, última migração), as caixas do caminho do dado que acendem por fluxo (login, nova entrega,
+  GPS, deploy) e por passo, os frameworks/versões de cada caixa e as ferramentas usadas. O conteúdo vem da API
+  (`GET /arquitetura`), o mesmo que o painel web desenha: muda num lugar só. As regras sem Android (colunas,
+  caixas acesas, tempo no ar) ficam em `desenvolvimento/Arquitetura.kt`, testadas na JVM.
 - **Empresa → entrega → entregador** (módulo Suporte): o ícone de loja em "Acompanhar rotas" abre **Empresas**
   (lista + cadastro com CNPJ, e-mail do Portal, telefone, CEP via ViaCEP e ponto no mapa via OpenStreetMap). O
   cadastro mostra o código de ativação uma vez e leva para **Nova entrega**: escolhe a empresa (o destino é o
@@ -195,6 +202,7 @@ Testes de unidade (JVM, sem emulador) em `app/src/test`:
 | `MascarasTest` | matrícula em maiúsculas, código de ativação com 8 letras/números, e-mail sem espaço e minúsculo, PIN só com 6 números; CNPJ, telefone, CEP, UF e decimal com vírgula |
 | `CnpjTest` | dígitos verificadores do CNPJ numérico e do alfanumérico (exemplo oficial `12ABC34501DE35`), formatação |
 | `MascaraVisualTest` | texto da tela com a pontuação e o cursor pulando os símbolos |
+| `ArquiteturaTest` | colunas do desenho, caixas acesas por fluxo, ferramentas por categoria, tempo no ar e leitura da resposta da API |
 | `DnsComReservaTest` | DNS da rede quando responde certo; reserva quando ele falha ou devolve 127.0.0.1/0.0.0.0; `localhost` do emulador continua valendo |
 | `AutorizacaoInterceptorTest` (MockWebServer) | Bearer só nas chamadas autenticadas; 401 encerra a sessão, mas 401 do login não |
 

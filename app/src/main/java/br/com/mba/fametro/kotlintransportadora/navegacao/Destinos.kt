@@ -26,5 +26,8 @@ import kotlinx.serialization.Serializable
 /** @param empresa matrícula da empresa já escolhida (vindo da lista ou do cadastro) */
 @Serializable data class NovaEntrega(val empresa: String? = null)
 
+// desenvolvimento (mensageria:monitorar)
+@Serializable object ComoFunciona
+
 // perfis do painel sem módulo no app (Administrativo, Financeiro, Desenvolvimento)
 @Serializable object SemModulo

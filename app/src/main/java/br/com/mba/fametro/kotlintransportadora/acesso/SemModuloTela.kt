@@ -17,14 +17,14 @@ import br.com.mba.fametro.kotlintransportadora.core.ui.componentes.Vazio
 import br.com.mba.fametro.kotlintransportadora.core.ui.tema.Cores
 import br.com.mba.fametro.kotlintransportadora.navegacao.container
 
-/** Administrativo, Financeiro e Desenvolvimento trabalham no painel web: o app só avisa. */
+/** Administrativo e Financeiro trabalham no painel web: o app só avisa. */
 @Composable
 fun SemModuloTela(sessao: Sessao) {
     val c = container()
     Scaffold(topBar = { Topo("RotaCerta", sessao.nome, acoes = { BotaoSair { c.sessao.sair() } }) }, containerColor = Cores.Fundo) { m ->
         Column(Modifier.fillMaxSize().padding(m)) {
             Vazio("Use o painel web", "O perfil ${sessao.perfil} (${sessao.matricula}) trabalha pelo navegador. " +
-                "No celular há os módulos do entregador, do cliente e o acompanhamento do Suporte.", Icons.Filled.Computer)
+                "No celular há os módulos do entregador, do cliente, do Suporte e o \"Como funciona\" do Desenvolvimento.", Icons.Filled.Computer)
         }
     }
 }

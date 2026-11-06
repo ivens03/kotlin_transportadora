@@ -15,6 +15,7 @@ data class Sessao(
     val entregador get() = tipoCredencial == "APP_ENTREGADOR"
     val cliente get() = "encomenda:acompanhar" in permissoes
     val acompanhaMapa get() = "mapa:acompanhar" in permissoes
+    val monitora get() = "mensageria:monitorar" in permissoes
     val primeiroNome get() = nome.trim().substringBefore(' ')
 
     fun expirada(agora: Instant = Instant.now()) = !expiraEm.isAfter(agora)
@@ -25,11 +26,12 @@ data class Sessao(
             entregador -> Modulo.ENTREGADOR
             cliente -> Modulo.CLIENTE
             acompanhaMapa -> Modulo.SUPORTE
+            monitora -> Modulo.DESENVOLVIMENTO
             else -> Modulo.SEM_MODULO
         }
 }
 
-enum class Modulo { ENTREGADOR, CLIENTE, SUPORTE, SEM_MODULO }
+enum class Modulo { ENTREGADOR, CLIENTE, SUPORTE, DESENVOLVIMENTO, SEM_MODULO }
 
 /** Estado da sessão observado pela raiz da navegação. */
 sealed interface EstadoSessao {

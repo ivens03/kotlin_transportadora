@@ -306,3 +306,17 @@ data class NovaCarga(
 @Serializable data class NovaRota(val veiculoId: Long, val entregadorMatricula: String, val cargaIds: List<Long>)
 
 @Serializable data class IncluirCargas(val cargaIds: List<Long>)
+
+// Desenvolvimento: "Como funciona" (GET /arquitetura) — o mesmo JSON que o painel web desenha
+@Serializable data class Tecnologia(val nome: String, val versao: String = "", val papel: String)
+/** [grupo] "uso" = caminho do dado quando alguém usa o sistema; "entrega" = do código ao ar. */
+@Serializable data class Camada(val id: String, val grupo: String, val nome: String, val onde: String, val papel: String,
+                                val tecnologias: List<Tecnologia> = emptyList())
+@Serializable data class Passo(val de: String, val para: String, val oque: String)
+@Serializable data class Fluxo(val id: String, val titulo: String, val resumo: String, val passos: List<Passo>)
+@Serializable data class Ferramenta(val nome: String, val categoria: String, val para: String)
+@Serializable data class AmbienteServidor(val perfil: String, val java: String, val springBoot: String, val hibernate: String,
+                                          val banco: String, val migracao: String, val servidor: String,
+                                          val noArDesde: String, val agora: String)
+@Serializable data class Arquitetura(val ambiente: AmbienteServidor, val camadas: List<Camada>, val fluxos: List<Fluxo>,
+                                     val ferramentas: List<Ferramenta>)

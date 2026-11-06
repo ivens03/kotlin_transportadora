@@ -77,6 +77,10 @@ interface RotaCertaApi {
     @POST("clientes")
     suspend fun cadastrarEmpresa(@Body corpo: NovaEmpresa): CodigoAtivacao
 
+    /** Desenvolvimento: arquitetura (camadas, fluxos, ferramentas) + ambiente medido no servidor. */
+    @GET("arquitetura")
+    suspend fun arquitetura(): Arquitetura
+
     @GET("entregadores")
     suspend fun entregadores(@Query("status") status: String = "ATIVO", @Query("size") tamanho: Int = 100): Pagina<Entregador>
 

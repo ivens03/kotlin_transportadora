@@ -17,6 +17,7 @@ import br.com.mba.fametro.kotlintransportadora.RotaCertaApp
 import br.com.mba.fametro.kotlintransportadora.acesso.EntrarTela
 import br.com.mba.fametro.kotlintransportadora.acesso.PrimeiroAcessoTela
 import br.com.mba.fametro.kotlintransportadora.acesso.SemModuloTela
+import br.com.mba.fametro.kotlintransportadora.desenvolvimento.ComoFuncionaTela
 import br.com.mba.fametro.kotlintransportadora.acesso.TrocarCredencialTela
 import br.com.mba.fametro.kotlintransportadora.cliente.AvisosTela
 import br.com.mba.fametro.kotlintransportadora.cliente.EncomendaDetalheTela
@@ -83,6 +84,7 @@ private fun NavegacaoModulo(sessao: Sessao) {
         Modulo.ENTREGADOR -> MinhasRotas
         Modulo.CLIENTE -> Encomendas
         Modulo.SUPORTE -> RotasAcompanhar
+        Modulo.DESENVOLVIMENTO -> ComoFunciona
         Modulo.SEM_MODULO -> SemModulo
     }
     // cliente: acompanha os avisos do webhook enquanto estiver logado (notificação a cada aviso novo)
@@ -121,6 +123,7 @@ private fun NavegacaoModulo(sessao: Sessao) {
                 aoAbrirRota = { id -> nav.navigate(RotaMapa(id)) { popUpTo<NovaEntrega> { inclusive = true } } })
         }
         composable<RotaMapa> { RotaMapaTela(it.toRoute<RotaMapa>().id, aoVoltar = { nav.popBackStack() }) }
+        composable<ComoFunciona> { ComoFuncionaTela(sessao) }
         composable<SemModulo> { SemModuloTela(sessao) }
     }
 }
